@@ -7,25 +7,36 @@
 }
 
 html, body {
+    width: 100%;
     min-height: 100vh;
     background-color: #f1f5f9;
     color: #0f172a;
     display: flex;
     justify-content: center;
+    overflow-x: hidden;
 }
 
-/* Moldura proporcional universal: ocupa 100% no celular e escala até 600px em tablets/PC */
+/* Container mobile ocupando 100% da largura útil sem margens laterais sobrando */
 .app-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
     min-height: 100vh;
     background-color: #ffffff;
-    padding: 16px 16px 90px 16px;
+    padding: 16px 12px 90px 12px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
+    overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 600px;
+        padding: 20px 24px 90px 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
 }
 
 .app-header {
@@ -35,6 +46,7 @@ html, body {
     padding-bottom: 12px;
     border-bottom: 1px solid #e2e8f0;
     width: 100%;
+    max-width: 100%;
     flex-shrink: 0;
 }
 
@@ -82,12 +94,13 @@ html, body {
     background-color: #10b981;
 }
 
-/* Todas as 4 abas rigorosamente com 100% da largura útil */
+/* Abas estendendo em 100% */
 .tab-content {
     display: none;
     flex-direction: column;
     gap: 16px;
     width: 100%;
+    max-width: 100%;
     flex: 1;
 }
 .tab-content.active { display: flex; }
@@ -96,50 +109,55 @@ html, body {
     background: linear-gradient(135deg, #0f172a, #1e293b);
     color: #ffffff;
     border-radius: 18px;
-    padding: 22px;
+    padding: 20px 16px;
     width: 100%;
+    max-width: 100%;
 }
 .balance-label { font-size: 0.82rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-.balance-value { font-size: 2rem; font-weight: 800; margin-top: 4px; }
+.balance-value { font-size: 1.8rem; font-weight: 800; margin-top: 4px; }
 
 .flow-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     width: 100%;
+    max-width: 100%;
 }
-.card-flow { border-radius: 14px; padding: 14px; color: white; width: 100%; }
+.card-flow { border-radius: 14px; padding: 14px; color: white; width: 100%; max-width: 100%; }
 .card-green { background: linear-gradient(135deg, #059669, #10b981); }
 .card-red { background: linear-gradient(135deg, #dc2626, #ef4444); }
 .flow-label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.9; }
-.card-flow h3 { font-size: 1.25rem; font-weight: 700; margin-top: 4px; }
+.card-flow h3 { font-size: 1.15rem; font-weight: 700; margin-top: 4px; word-break: break-word; }
 
 .card-cartao {
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
     border-radius: 16px;
-    padding: 14px 18px;
+    padding: 14px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    max-width: 100%;
 }
 .cartao-label { font-size: 0.82rem; opacity: 0.9; }
-.card-cartao h3 { font-size: 1.3rem; font-weight: 700; margin-top: 2px; }
+.card-cartao h3 { font-size: 1.25rem; font-weight: 700; margin-top: 2px; word-break: break-word; }
 .cartao-icon { font-size: 1.6rem; }
 
 .chart-section, .form-card {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 18px;
-    padding: 16px;
+    padding: 16px 14px;
     width: 100%;
+    max-width: 100%;
 }
 .section-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
 
 .chart-wrapper {
     position: relative;
     width: 100%;
+    max-width: 100%;
     height: 200px;
     display: flex;
     align-items: center;
@@ -147,21 +165,22 @@ html, body {
 }
 .empty-state { font-size: 0.88rem; color: #94a3b8; text-align: center; padding: 14px 0; width: 100%; }
 
-.ranking-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.ranking-list { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 100%; }
 .ranking-row {
     display: flex;
     justify-content: space-between;
     background: #ffffff;
-    padding: 10px 14px;
+    padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid #e2e8f0;
     font-size: 0.88rem;
     width: 100%;
+    max-width: 100%;
 }
 .ranking-name { font-weight: 600; color: #334155; }
 .ranking-val { font-weight: 700; color: #ef4444; }
 
-/* Calendário */
+/* Calendário fluido */
 .month-selector {
     display: flex;
     overflow-x: auto;
@@ -169,6 +188,7 @@ html, body {
     padding-bottom: 6px;
     scrollbar-width: none;
     width: 100%;
+    max-width: 100%;
 }
 .month-selector::-webkit-scrollbar { display: none; }
 .month-btn {
@@ -185,7 +205,7 @@ html, body {
 .month-btn.is-current-month { border: 2px solid #10b981; color: #047857; background: #ecfdf5; }
 .month-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; }
 
-.fatura-totals { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; width: 100%; }
+.fatura-totals { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; width: 100%; max-width: 100%; }
 .fatura-badge { padding: 5px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; }
 .fatura-badge.red { background: #fee2e2; color: #b91c1c; }
 .fatura-badge.purple { background: #ede9fe; color: #6d28d9; }
@@ -201,13 +221,14 @@ html, body {
     margin-bottom: 12px;
     gap: 8px;
     width: 100%;
+    max-width: 100%;
 }
 .search-icon { font-size: 0.95rem; opacity: 0.6; }
 .search-box input { border: none; outline: none; width: 100%; font-size: 0.92rem; background: transparent; }
 
-/* Formulário de Cadastro Proporcional */
-.input-row { display: flex; gap: 10px; width: 100%; }
-.input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; width: 100%; }
+/* Formulário de cadastro em largura total */
+.input-row { display: flex; gap: 8px; width: 100%; max-width: 100%; }
+.input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; width: 100%; max-width: 100%; }
 .input-group label { font-size: 0.82rem; font-weight: 600; color: #475569; }
 .input-group input, .input-group select {
     padding: 12px;
@@ -216,16 +237,18 @@ html, body {
     font-size: 0.92rem;
     background: #fff;
     width: 100%;
+    max-width: 100%;
 }
 
 .label-with-action { display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .btn-text-action { background: none; border: none; color: #2563eb; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
 
-.checkboxes-area { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 16px 0; width: 100%; }
+.checkboxes-area { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 16px 0; width: 100%; max-width: 100%; }
 .switch-label { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer; }
 
 .btn-primary {
     width: 100%;
+    max-width: 100%;
     padding: 13px;
     border: none;
     background-color: #2563eb;
@@ -246,8 +269,8 @@ html, body {
     cursor: pointer;
 }
 
-/* Lista de Contas */
-.contas-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+/* Lista de contas */
+.contas-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 100%; }
 .conta-item {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -257,13 +280,14 @@ html, body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    max-width: 100%;
 }
 .conta-item-left { display: flex; flex-direction: column; gap: 2px; }
 .conta-item-desc { font-weight: 600; font-size: 0.92rem; color: #0f172a; display: flex; align-items: center; gap: 6px; }
 .conta-item-meta { font-size: 0.78rem; color: #64748b; display: flex; gap: 6px; align-items: center; }
 .badge-cartao { background: #ede9fe; color: #6d28d9; padding: 2px 6px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
 
-.conta-item-right { display: flex; align-items: center; gap: 10px; }
+.conta-item-right { display: flex; align-items: center; gap: 8px; }
 .conta-item-val { font-weight: 700; font-size: 0.95rem; text-align: right; }
 .conta-item-val.receita { color: #10b981; }
 .conta-item-val.despesa { color: #ef4444; }
@@ -273,7 +297,7 @@ html, body {
 .status-badge.pendente { background: #fef3c7; color: #b45309; }
 .btn-edit { background: none; border: none; font-size: 1rem; cursor: pointer; opacity: 0.6; padding: 4px; }
 
-/* Bloco de Notas Estilo Google Keep com Largura Igual */
+/* Bloco de notas */
 .keep-card-create {
     background: #ffffff;
     border: 1px solid #cbd5e1;
@@ -283,6 +307,7 @@ html, body {
     flex-direction: column;
     gap: 10px;
     width: 100%;
+    max-width: 100%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .keep-input-title {
@@ -338,6 +363,7 @@ html, body {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     width: 100%;
+    max-width: 100%;
 }
 .keep-note-item {
     border: 1px solid #cbd5e1;
@@ -348,16 +374,38 @@ html, body {
     justify-content: space-between;
     min-height: 110px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    word-break: break-word;
 }
 .keep-note-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 4px; }
 .keep-note-body { font-size: 0.82rem; color: #334155; word-break: break-word; white-space: pre-wrap; }
 .keep-note-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
 .btn-keep-delete { background: none; border: none; font-size: 0.88rem; cursor: pointer; opacity: 0.6; }
 
-/* Modais */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+/* Modais responsivos */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    width: 100vw;
+}
 .modal-overlay.active { display: flex; }
-.modal-card { background: #fff; width: 100%; max-width: 440px; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; max-height: 85vh; overflow-y: auto; }
+.modal-card {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
 .modal-title { font-weight: 700; font-size: 1.1rem; color: #0f172a; }
 .modal-close { background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; }
@@ -382,14 +430,13 @@ html, body {
 .score-circle { width: 70px; height: 70px; border-radius: 50%; background: #10b981; color: white; font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
 .health-message { font-size: 0.9rem; color: #475569; line-height: 1.4; text-align: center; }
 
-/* Barra Inferior com a mesma largura do container em qualquer tela */
+/* Barra inferior ocupando 100% no celular */
 .bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
     height: 62px;
     background-color: #ffffff;
     border-top: 1px solid #e2e8f0;
@@ -398,6 +445,15 @@ html, body {
     align-items: center;
     z-index: 100;
 }
+
+@media (min-width: 768px) {
+    .bottom-nav {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 600px;
+    }
+}
+
 .nav-item {
     background: none;
     border: none;
@@ -408,6 +464,7 @@ html, body {
     color: #94a3b8;
     cursor: pointer;
     font-size: 0.75rem;
+    flex: 1;
 }
 .nav-item.active { color: #2563eb; font-weight: 700; }
 .nav-icon { font-size: 1.25rem; }

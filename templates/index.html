@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Financely</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Topo com Lembrete (🔔) e Saúde (🩺) no Canto Direito -->
+        <header class="app-header">
+            <span class="app-title" id="page-title">Início</span>
+            <div class="header-actions">
+                <button id="btn-lembretes" class="btn-header-action" onclick="openLembretesModal()" type="button" title="Lembretes">
+                    <span class="header-icon">🔔</span>
+                    <span class="badge-count" id="lembretes-badge" style="display: none;">0</span>
+                </button>
+                <button id="btn-saude" class="btn-header-action" onclick="openHealthModal()" type="button" title="Saúde Financeira">
+                    <span class="header-icon">🩺</span>
+                    <span class="health-badge" id="health-indicator"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ABA 1: INÍCIO -->
+        <main id="tab-inicio" class="tab-content active">
+            <section class="balance-card">
+                <p class="balance-label">Saldo Atual</p>
+                <h1 id="total-balance" class="balance-value">R$ 0,00</h1>
+            </section>
+
+            <div class="flow-cards">
+                <div class="card-flow card-green">
+                    <span class="flow-label">Entradas</span>
+                    <h3 id="flow-receitas">R$ 0,00</h3>
+                </div>
+                <div class="card-flow card-red">
+                    <span class="flow-label">Saídas</span>
+                    <h3 id="flow-despesas">R$ 0,00</h3>
+                </div>
+            </div>
+
+            <div class="card-cartao">
+                <div>
+                    <span class="cartao-label">💳 Despesas com Cartão</span>
+                    <h3 id="flow-cartao">R$ 0,00</h3>
+                </div>
+                <span class="cartao-icon">🛍️</span>
+            </div>
+
+            <section class="chart-section">
+                <h2 class="section-title">Onde estou mais gastando</h2>
+                <div id="ranking-gastos-list" class="ranking-list">
+                    <p class="empty-state">Sem despesas registradas.</p>
+                </div>
+            </section>
+
+            <section class="chart-section">
+                <h2 class="section-title">Evolução Financeira</h2>
+                <div class="chart-wrapper">
+                    <canvas id="financeChart"></canvas>
+                    <p id="empty-state-text" class="empty-state">Nenhum lançamento registrado.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- ABA 2: CALENDÁRIO / FATURAS -->
+        <main id="tab-calendario" class="tab-content">
+            <div class="month-selector" id="months-bar"></div>
+
+            <section class="chart-section">
+                <h2 class="section-title" id="selected-month-title">Faturas</h2>
+                
+                <div class="fatura-totals">
+                    <span class="fatura-badge red" id="fatura-total-despesa">Fatura: R$ 0,00</span>
+                    <span class="fatura-badge purple" id="fatura-total-cartao">💳 Cartão: R$ 0,00</span>
+                    <span class="fatura-badge green" id="fatura-total-receita">Receitas: R$ 0,00</span>
+                </div>
+
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-faturas" placeholder="Buscar fatura ou categoria..." oninput="filterFaturas()">
+                </div>
+
+                <div id="fatura-items-list" class="contas-list">
+                    <p class="empty-state">Nenhuma conta para este mês.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- ABA 3: CADASTRO -->
+        <main id="tab-contas" class="tab-content">
+            <form id="conta-form" class="form-card">
+                <h2 class="section-title">Cadastrar Lançamento</h2>
+                
+                <div class="input-group">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" placeholder="Ex: Salário, Aluguel, Nubank" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1;">
+                        <label for="valor">Valor (R$)</label>
+                        <input type="number" step="0.01" id="valor" placeholder="0.00" required>
+                    </div>
+                    <div class="input-group" style="width: 110px;">
+                        <label for="vencimento_dia">Dia Venc.</label>
+                        <input type="number" id="vencimento_dia" min="1" max="31" value="1" required>
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1;">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo">
+                            <option value="despesa">Despesa (Vermelho)</option>
+                            <option value="receita">Receita (Verde)</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label for="status">Status</label>
+                        <select id="status">
+                            <option value="pendente">Pendente</option>
+                            <option value="pago">Pago</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-with-action">
+                        <label for="categoria">Categoria</label>
+                        <button type="button" class="btn-text-action" onclick="promptNovaCategoria()">+ Nova Categoria</button>
+                    </div>
+                    <select id="categoria"></select>
+                </div>
+
+                <div class="input-group">
+                    <label for="mes">Mês de Referência</label>
+                    <select id="mes">
+                        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+                        <option value="3">Março</option><option value="4">Abril</option>
+                        <option value="5">Maio</option><option value="6">Junho</option>
+                        <option value="7">Julho</option><option value="8">Agosto</option>
+                        <option value="9">Setembro</option><option value="10">Outubro</option>
+                        <option value="11">Novembro</option><option value="12">Dezembro</option>
+                    </select>
+                </div>
+
+                <div class="checkboxes-area">
+                    <label class="switch-label">
+                        <input type="checkbox" id="eh_cartao">
+                        <span>💳 Despesa no Cartão de Crédito</span>
+                    </label>
+                    <label class="switch-label">
+                        <input type="checkbox" id="mensal">
+                        <span>🔁 Conta Mensal (12 meses)</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary">Salvar Lançamento</button>
+            </form>
+        </main>
+
+        <!-- ABA 4: NOTAS ESTILO GOOGLE KEEP -->
+        <main id="tab-notas" class="tab-content">
+            <form id="keep-form" class="keep-card-create" onsubmit="saveNewNota(event)">
+                <input type="text" id="nota-titulo" placeholder="Título da anotação..." class="keep-input-title">
+                <textarea id="nota-conteudo" placeholder="Escrever uma nota ou lista..." class="keep-textarea" rows="2" required></textarea>
+                
+                <div class="keep-footer">
+                    <div class="color-picker-row">
+                        <label class="color-dot" style="background: #ffffff;"><input type="radio" name="nota-cor" value="#ffffff" checked></label>
+                        <label class="color-dot" style="background: #fef08a;"><input type="radio" name="nota-cor" value="#fef08a"></label>
+                        <label class="color-dot" style="background: #bbf7d0;"><input type="radio" name="nota-cor" value="#bbf7d0"></label>
+                        <label class="color-dot" style="background: #bae6fd;"><input type="radio" name="nota-cor" value="#bae6fd"></label>
+                        <label class="color-dot" style="background: #fed7aa;"><input type="radio" name="nota-cor" value="#fed7aa"></label>
+                    </div>
+                    <button type="submit" class="btn-keep-add">+ Adicionar</button>
+                </div>
+            </form>
+
+            <div id="keep-grid" class="keep-grid">
+                <p class="empty-state">Nenhuma anotação criada ainda.</p>
+            </div>
+        </main>
+
+        <!-- MODAL DE LEMBRETES (SINO 🔔 NO TOPO DIREITO) -->
+        <div id="modal-lembretes" class="modal-overlay" onclick="if(event.target===this) closeLembretesModal()">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <span class="modal-title">🔔 Lembretes de Vencimento</span>
+                    <button class="modal-close" type="button" onclick="closeLembretesModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-lembretes-list">
+                    <p class="empty-state">Tudo em dia! Sem contas pendentes ou atrasadas.</p>
+                </div>
+                <button class="btn-primary" type="button" onclick="closeLembretesModal()">Fechar</button>
+            </div>
+        </div>
+
+        <!-- MODAL DE EDIÇÃO COM LÁPIS (✏️) -->
+        <div id="modal-edicao" class="modal-overlay" onclick="if(event.target===this) closeEditModal()">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <span class="modal-title">✏️ Editar Lançamento</span>
+                    <button class="modal-close" type="button" onclick="closeEditModal()">&times;</button>
+                </div>
+                <form id="edit-form" onsubmit="saveEdit(event)">
+                    <input type="hidden" id="edit-id">
+                    
+                    <div class="input-group">
+                        <label>Descrição</label>
+                        <input type="text" id="edit-descricao" required>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Valor (R$)</label>
+                            <input type="number" step="0.01" id="edit-valor" required>
+                        </div>
+                        <div class="input-group" style="width: 100px;">
+                            <label>Dia Venc.</label>
+                            <input type="number" id="edit-vencimento" min="1" max="31" required>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Tipo</label>
+                            <select id="edit-tipo">
+                                <option value="despesa">Despesa</option>
+                                <option value="receita">Receita</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>Status</label>
+                            <select id="edit-status">
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Categoria</label>
+                        <select id="edit-categoria"></select>
+                    </div>
+                    <div class="checkboxes-area">
+                        <label class="switch-label">
+                            <input type="checkbox" id="edit-cartao">
+                            <span>💳 É despesa de Cartão</span>
+                        </label>
+                        <label class="switch-label">
+                            <input type="checkbox" id="edit-mensal">
+                            <span>🔁 Conta Mensal</span>
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-danger" onclick="deleteConta()">Excluir</button>
+                        <button type="submit" class="btn-primary" style="flex: 2;">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL POP-UP DE SAÚDE -->
+        <div id="modal-saude" class="modal-overlay" onclick="if(event.target===this) closeHealthModal()">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <span class="modal-title">🩺 Minha Saúde Financeira</span>
+                    <button class="modal-close" type="button" onclick="closeHealthModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="health-score-container">
+                        <div class="score-circle" id="modal-score-circle">
+                            <span id="modal-health-score">0%</span>
+                        </div>
+                        <h3 id="modal-health-title">Diagnóstico</h3>
+                    </div>
+                    <p id="modal-health-msg" class="health-message"></p>
+                </div>
+                <button class="btn-primary" type="button" onclick="closeHealthModal()">OK</button>
+            </div>
+        </div>
+
+        <!-- Barra Inferior 100% Fixa -->
+        <nav class="bottom-nav">
+            <button id="nav-btn-inicio" class="nav-item active" type="button" onclick="switchTab('inicio')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Início</span>
+            </button>
+            <button id="nav-btn-calendario" class="nav-item" type="button" onclick="switchTab('calendario')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Faturas</span>
+            </button>
+            <button id="nav-btn-contas" class="nav-item" type="button" onclick="switchTab('contas')">
+                <span class="nav-icon">➕</span>
+                <span class="nav-label">Cadastrar</span>
+            </button>
+            <button id="nav-btn-notas" class="nav-item" type="button" onclick="switchTab('notas')">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Notas</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html, body {
+    min-height: 100vh;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    display: flex;
+    justify-content: center;
+}
+
+/* Moldura que se adapta: 100% no celular e até 768px no computador */
+.app-container {
+    width: 100%;
+    max-width: 768px; /* Proporção ideal sem ficar espremido */
+    min-height: 100vh;
+    background-color: #ffffff;
+    padding: 20px 24px 90px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    width: 100%;
+}
+
+.app-title { font-size: 1.35rem; font-weight: 700; color: #0f172a; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+
+.btn-header-action {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.header-icon { font-size: 1.25rem; }
+
+.badge-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.health-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #10b981;
+}
+
+/* Todas as abas com 100% da largura útil */
+.tab-content {
+    display: none;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+.tab-content.active { display: flex; }
+
+.balance-card {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    width: 100%;
+}
+.balance-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+.balance-value { font-size: 2.2rem; font-weight: 800; margin-top: 6px; }
+
+.flow-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+.card-flow { border-radius: 14px; padding: 16px; color: white; width: 100%; }
+.card-green { background: linear-gradient(135deg, #059669, #10b981); }
+.card-red { background: linear-gradient(135deg, #dc2626, #ef4444); }
+.flow-label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.9; }
+.card-flow h3 { font-size: 1.35rem; font-weight: 700; margin-top: 4px; }
+
+.card-cartao {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.cartao-label { font-size: 0.85rem; opacity: 0.9; }
+.card-cartao h3 { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+.cartao-icon { font-size: 1.8rem; }
+
+.chart-section, .form-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 20px;
+    width: 100%;
+}
+.section-title { font-size: 1.05rem; font-weight: 700; color: #1e293b; margin-bottom: 14px; }
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.empty-state { font-size: 0.9rem; color: #94a3b8; text-align: center; padding: 16px 0; width: 100%; }
+
+.ranking-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.ranking-row {
+    display: flex;
+    justify-content: space-between;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    width: 100%;
+}
+.ranking-name { font-weight: 600; color: #334155; }
+.ranking-val { font-weight: 700; color: #ef4444; }
+
+/* Calendário */
+.month-selector {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    width: 100%;
+}
+.month-selector::-webkit-scrollbar { display: none; }
+.month-btn {
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+}
+.month-btn.is-current-month { border: 2px solid #10b981; color: #047857; background: #ecfdf5; }
+.month-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; }
+
+.fatura-totals { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; width: 100%; }
+.fatura-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+.fatura-badge.red { background: #fee2e2; color: #b91c1c; }
+.fatura-badge.purple { background: #ede9fe; color: #6d28d9; }
+.fatura-badge.green { background: #d1fae5; color: #047857; }
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    gap: 10px;
+    width: 100%;
+}
+.search-icon { font-size: 1rem; opacity: 0.6; }
+.search-box input { border: none; outline: none; width: 100%; font-size: 0.95rem; background: transparent; }
+
+/* Formulário de Cadastro */
+.input-row { display: flex; gap: 12px; width: 100%; }
+.input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; width: 100%; }
+.input-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+.input-group input, .input-group select {
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #fff;
+    width: 100%;
+}
+
+.label-with-action { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.btn-text-action { background: none; border: none; color: #2563eb; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+
+.checkboxes-area { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 18px 0; width: 100%; }
+.switch-label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; cursor: pointer; }
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.btn-danger {
+    padding: 14px;
+    border: none;
+    background-color: #ef4444;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* Lista de Faturas/Contas */
+.contas-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.conta-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.conta-item-left { display: flex; flex-direction: column; gap: 4px; }
+.conta-item-desc { font-weight: 600; font-size: 0.95rem; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+.conta-item-meta { font-size: 0.8rem; color: #64748b; display: flex; gap: 8px; align-items: center; }
+.badge-cartao { background: #ede9fe; color: #6d28d9; padding: 2px 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+
+.conta-item-right { display: flex; align-items: center; gap: 12px; }
+.conta-item-val { font-weight: 700; font-size: 1rem; text-align: right; }
+.conta-item-val.receita { color: #10b981; }
+.conta-item-val.despesa { color: #ef4444; }
+
+.status-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: none; }
+.status-badge.pago { background: #d1fae5; color: #047857; }
+.status-badge.pendente { background: #fef3c7; color: #b45309; }
+.btn-edit { background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.6; padding: 4px; }
+
+/* Aba de Notas (Google Keep Style) com Proporção Expandida */
+.keep-card-create {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+.keep-input-title {
+    border: none;
+    outline: none;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0f172a;
+    width: 100%;
+}
+.keep-textarea {
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 0.95rem;
+    color: #334155;
+    font-family: inherit;
+    width: 100%;
+}
+.keep-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    width: 100%;
+}
+.color-picker-row { display: flex; gap: 8px; }
+.color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.color-dot input { display: none; }
+.btn-keep-add {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.keep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+}
+.keep-note-item {
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.keep-note-title { font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 6px; }
+.keep-note-body { font-size: 0.88rem; color: #334155; word-break: break-word; white-space: pre-wrap; }
+.keep-note-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
+.btn-keep-delete { background: none; border: none; font-size: 0.95rem; cursor: pointer; opacity: 0.6; }
+
+/* Modais */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-card { background: #fff; width: 100%; max-width: 440px; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 16px; max-height: 85vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-weight: 700; font-size: 1.15rem; color: #0f172a; }
+.modal-close { background: none; border: none; font-size: 1.6rem; color: #94a3b8; cursor: pointer; }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+.modal-lembrete-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    margin-bottom: 8px;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    width: 100%;
+}
+.modal-lembrete-row.atrasada { background: #fee2e2; border-color: #fecaca; color: #b91c1c; font-weight: 600; }
+.modal-lembrete-row.hoje { background: #fef3c7; border-color: #fde68a; color: #b45309; font-weight: 600; }
+
+.health-score-container { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.score-circle { width: 75px; height: 75px; border-radius: 50%; background: #10b981; color: white; font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
+.health-message { font-size: 0.95rem; color: #475569; line-height: 1.5; text-align: center; }
+
+/* Barra Inferior Fixa rigorosamente alinhada ao container */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 768px; /* Mesma largura exata do container */
+    height: 65px;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+.nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+.nav-item.active { color: #2563eb; font-weight: 700; }
+.nav-icon { font-size: 1.3rem; }

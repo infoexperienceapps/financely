@@ -1,6 +1,7 @@
 ﻿from flask import Flask, render_template, jsonify, request
 import sqlite3
 from datetime import datetime
+import re
 
 app = Flask(__name__)
 DB_NAME = "financely.db"
@@ -12,7 +13,6 @@ def get_db():
 
 def init_db():
     with get_db() as conn:
-        # Tabela de contas
         conn.execute("""
             CREATE TABLE IF NOT EXISTS contas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +29,6 @@ def init_db():
                 data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        # Tabela de categorias
         conn.execute("""
             CREATE TABLE IF NOT EXISTS categorias (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +39,6 @@ def init_db():
         for c in padrao:
             conn.execute("INSERT OR IGNORE INTO categorias (nome) VALUES (?)", (c,))
 
-        # Tabela de notas estilo Google Keep
         conn.execute("""
             CREATE TABLE IF NOT EXISTS notas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,6 +55,125 @@ init_db()
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/api/chat', methods=['POST'])
+def finance_chat():
+    data = request.get_json(force=True) or {}
+    pergunta = str(data.get('mensagem', '')).strip().lower()
+    
+    if not pergunta:
+        return jsonify({"resposta": "Por favor, digite sua pergunta sobre suas finanças!"})
+
+    mes_atual = datetime.now().month
+    ano_atual = datetime.now().year
+    hoje_dia = datetime.now().day
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM contas WHERE (mes = ? AND ano = ?) OR mensal = 1", (mes_atual, ano_atual))
+        contas_mes = [dict(r) for r in cursor.fetchall()]
+
+        cursor.execute("SELECT * FROM notas ORDER BY id DESC")
+        notas_app = [dict(r) for r in cursor.fetchall()]
+
+    # Métricas calculadas em tempo real
+    receitas = [c for c in contas_mes if c['tipo'] == 'receita']
+    despesas = [c for c in contas_mes if c['tipo'] == 'despesa']
+    
+    total_receitas = sum(c['valor'] for c in receitas)
+    total_despesas = sum(c['valor'] for c in despesas)
+    saldo = total_receitas - total_despesas
+    
+    despesas_cartao = [c for c in despesas if c['eh_cartao']]
+    total_cartao = sum(c['valor'] for c in despesas_cartao)
+    
+    contas_atrasadas = [c for c in despesas if c['status'] == 'pendente' and c['vencimento_dia'] < hoje_dia]
+    contas_hoje = [c for c in despesas if c['status'] == 'pendente' and c['vencimento_dia'] == hoje_dia]
+    contas_pendentes = [c for c in despesas if c['status'] == 'pendente']
+
+    # Raciocínio por categorias
+    cat_totais = {}
+    for c in despesas:
+        cat = c['categoria']
+        cat_totais[cat] = cat_totais.get(cat, 0.0) + c['valor']
+    maior_categoria = max(cat_totais.items(), key=lambda x: x[1]) if cat_totais else None
+
+    # Motor de raciocínio da IA interna do Financely
+    if any(p in pergunta for p in ['saldo', 'quanto tenho', 'balanço', 'lucro']):
+        estado = "positivo (no azul) 🟢" if saldo >= 0 else "negativo (no vermelho) 🔴"
+        resposta = (f"Seu saldo atual no mês é de **R$ {saldo:,.2f}** ({estado}).\n\n"
+                    f"• Entradas totais: R$ {total_receitas:,.2f}\n"
+                    f"• Saídas totais: R$ {total_despesas:,.2f}")
+
+    elif any(p in pergunta for p in ['cartao', 'cartão', 'fatura do cartao', 'crédito']):
+        if total_cartao > 0:
+            itens = "\n".join([f"  - {c['descricao']}: R$ {c['valor']:,.2f} (Venc. dia {c['vencimento_dia']})" for c in despesas_cartao])
+            resposta = (f"💳 O total lançado no cartão de crédito este mês é de **R$ {total_cartao:,.2f}**.\n\n"
+                        f"Detalhamento:\n{itens}")
+        else:
+            resposta = "Você não possui nenhuma despesa marcada no cartão de crédito este mês."
+
+    elif any(p in pergunta for p in ['atrasad', 'venceu', 'devendo', 'vencida']):
+        if contas_atrasadas:
+            lista = "\n".join([f"  ⚠️ {c['descricao']}: R$ {c['valor']:,.2f} (Venceu dia {c['vencimento_dia']})" for c in contas_atrasadas])
+            resposta = f"Você tem {len(contas_atrasadas)} conta(s) em atraso este mês:\n\n{lista}\n\nRecomendo quitar logo para evitar juros!"
+        else:
+            resposta = "🎉 Ótima notícia! Você não tem nenhuma conta atrasada no momento."
+
+    elif any(p in pergunta for p in ['hoje', 'vence hoje']):
+        if contas_hoje:
+            lista = "\n".join([f"  🔔 {c['descricao']}: R$ {c['valor']:,.2f}" for c in contas_hoje])
+            resposta = f"Atenção: Estas contas vencem hoje (Dia {hoje_dia}):\n\n{lista}"
+        else:
+            resposta = f"Nenhuma conta sua vence hoje (Dia {hoje_dia})."
+
+    elif any(p in pergunta for p in ['onde gasto mais', 'maior gasto', 'categoria', 'mais gastando']):
+        if maior_categoria:
+            pct = (maior_categoria[1] / total_despesas * 100) if total_despesas > 0 else 0
+            resposta = (f"🔍 A categoria onde você mais está gastando é **{maior_categoria[0]}**,\n"
+                        f"somando **R$ {maior_categoria[1]:,.2f}** ({pct:.1f}% de todas as suas despesas do mês).")
+        else:
+            resposta = "Você ainda não possui despesas cadastradas para avaliar onde está gastando mais."
+
+    elif any(p in pergunta for p in ['nota', 'anota', 'keep', 'bloco', 'lembrete']):
+        if notas_app:
+            titulos = "\n".join([f"  📝 {n['titulo'] or 'Sem título'}: {n['conteudo']}" for n in notas_app[:4]])
+            resposta = f"Aqui estão suas anotações recentes no Keep:\n\n{titulos}"
+        else:
+            resposta = "Você ainda não tem anotações cadastradas na aba de Notas."
+
+    elif any(p in pergunta for p in ['saúde', 'saude', 'diagnostico', 'situação']):
+        if total_receitas == 0:
+            resposta = "Cadastre suas receitas para eu avaliar sua saúde financeira com precisão."
+        else:
+            pct = (total_despesas / total_receitas) * 100
+            if pct <= 60:
+                resposta = f"Sua saúde financeira está **Excelente**! Você só comprometeu {pct:.0f}% da renda."
+            elif pct <= 85:
+                resposta = f"Sua saúde financeira está em **Atenção**: {pct:.0f}% da sua renda já está consumida."
+            else:
+                resposta = f"Alerta de saúde **Crítica**: Seus gastos atingiram {pct:.0f}% da renda. Corte despesas supérfluas."
+
+    elif any(p in pergunta for p in ['resumo', 'relatorio', 'relatório', 'tudo', 'geral']):
+        resposta = (f"📊 **Relatório Completo do Mês Atual:**\n\n"
+                    f"• Entradas: R$ {total_receitas:,.2f}\n"
+                    f"• Saídas: R$ {total_despesas:,.2f}\n"
+                    f"• Saldo Livre: R$ {saldo:,.2f}\n"
+                    f"• Fatura Cartão: R$ {total_cartao:,.2f}\n"
+                    f"• Contas Pendentes: {len(contas_pendentes)}\n"
+                    f"• Contas em Atraso: {len(contas_atrasadas)}\n"
+                    f"• Total de Anotações salvas: {len(notas_app)}")
+    else:
+        resposta = (f"Entendi sua dúvida! Com base nos dados do seu app:\n"
+                    f"Seu saldo atual é de R$ {saldo:,.2f}, com R$ {total_despesas:,.2f} em despesas cadastradas.\n\n"
+                    f"Você pode me perguntar especificamente sobre:\n"
+                    f"- 'Qual o meu saldo?'\n"
+                    f"- 'Quanto gastei no cartão?'\n"
+                    f"- 'Tenho contas atrasadas?'\n"
+                    f"- 'Onde estou gastando mais?'\n"
+                    f"- 'Resumo geral'")
+
+    return jsonify({"resposta": resposta})
 
 @app.route('/api/categorias', methods=['GET', 'POST'])
 def handle_categorias():
@@ -147,7 +264,6 @@ def get_resumo():
             if cartao:
                 total_cartao += val
 
-            # Lembretes de Vencimento
             if st == 'pendente':
                 if venc < hoje_dia:
                     lembretes.append({"msg": f"Atrasada: {desc} (Dia {venc})", "tipo": "atrasada", "valor": val})

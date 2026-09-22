@@ -28,28 +28,81 @@ window.switchTab = function(tabName) {
 
     const btnSaude = document.getElementById('btn-saude');
     const btnLembretes = document.getElementById('btn-lembretes');
+    const btnChat = document.getElementById('btn-chat');
 
     if (tabName === 'inicio') {
         document.getElementById('page-title').innerText = 'Início';
         btnSaude.style.display = 'flex';
         btnLembretes.style.display = 'flex';
+        btnChat.style.display = 'flex';
         loadDashboard();
     } else if (tabName === 'calendario') {
         document.getElementById('page-title').innerText = 'Faturas e Calendário';
         btnSaude.style.display = 'none';
         btnLembretes.style.display = 'none';
+        btnChat.style.display = 'none';
         loadFaturas(selectedMonth);
     } else if (tabName === 'contas') {
         document.getElementById('page-title').innerText = 'Cadastrar Lançamento';
         btnSaude.style.display = 'none';
         btnLembretes.style.display = 'none';
+        btnChat.style.display = 'none';
         document.getElementById('mes').value = selectedMonth;
     } else {
         document.getElementById('page-title').innerText = 'Bloco de Notas';
         btnSaude.style.display = 'none';
         btnLembretes.style.display = 'none';
+        btnChat.style.display = 'none';
         loadNotas();
     }
+};
+
+// =================== CHAT INTELIGENTE ===================
+window.openChatModal = function() {
+    document.getElementById('modal-chat').classList.add('active');
+    document.getElementById('chat-input').focus();
+};
+
+window.closeChatModal = function() {
+    document.getElementById('modal-chat').classList.remove('active');
+};
+
+window.sendChatMessage = function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const chatBox = document.getElementById('chat-messages');
+
+    // Adiciona a mensagem do usuário
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-msg user';
+    userDiv.innerText = msg;
+    chatBox.appendChild(userDiv);
+    input.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Loading temporário
+    const botLoading = document.createElement('div');
+    botLoading.className = 'chat-msg bot';
+    botLoading.innerText = 'Pensando e analisando suas finanças...';
+    chatBox.appendChild(botLoading);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensagem: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+        botLoading.innerText = data.resposta;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(() => {
+        botLoading.innerText = 'Desculpe, ocorreu uma falha ao consultar os dados.';
+    });
 };
 
 function initChart() {
@@ -81,7 +134,6 @@ function loadDashboard() {
             document.getElementById('flow-despesas').innerText = 'R$ ' + data.total_despesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             document.getElementById('flow-cartao').innerText = 'R$ ' + data.total_cartao.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-            // Pop-up de Lembretes no Sino do Topo
             currentLembretes = data.lembretes || [];
             const badgeLembretes = document.getElementById('lembretes-badge');
             if (currentLembretes.length > 0) {
@@ -95,7 +147,6 @@ function loadDashboard() {
             const badge = document.getElementById('health-indicator');
             badge.style.background = saudeAtual.status === 'otima' ? '#10b981' : (saudeAtual.status === 'alerta' ? '#f59e0b' : '#ef4444');
 
-            // Ranking
             const rankingBox = document.getElementById('ranking-gastos-list');
             if (data.ranking_gastos && data.ranking_gastos.length > 0) {
                 rankingBox.innerHTML = '';
@@ -109,7 +160,6 @@ function loadDashboard() {
                 rankingBox.innerHTML = '<p class="empty-state">Sem despesas registradas.</p>';
             }
 
-            // Gráfico
             const chartCanvas = document.getElementById('financeChart');
             const emptyText = document.getElementById('empty-state-text');
             if (data.labels && data.labels.length > 0) {
@@ -126,7 +176,6 @@ function loadDashboard() {
         });
 }
 
-// Modal de Lembretes (Acionado pelo Sino)
 window.openLembretesModal = function() {
     const list = document.getElementById('modal-lembretes-list');
     if (!currentLembretes || currentLembretes.length === 0) {
@@ -330,7 +379,7 @@ window.filterFaturas = function() {
     renderFaturasList(filtrados);
 };
 
-// =================== ABA NOTAS (GOOGLE KEEP) ===================
+// =================== ABA NOTAS ===================
 function loadNotas() {
     fetch('/api/notas')
         .then(res => res.json())

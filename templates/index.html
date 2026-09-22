@@ -9,10 +9,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Topo com Lembrete (🔔) e Saúde (🩺) no Canto Direito -->
+        <!-- Topo com Botão de Chat (💬), Lembrete (🔔) e Saúde (🩺) -->
         <header class="app-header">
             <span class="app-title" id="page-title">Início</span>
             <div class="header-actions">
+                <button id="btn-chat" class="btn-header-action" onclick="openChatModal()" type="button" title="Chat Inteligente">
+                    <span class="header-icon">💬</span>
+                </button>
                 <button id="btn-lembretes" class="btn-header-action" onclick="openLembretesModal()" type="button" title="Lembretes">
                     <span class="header-icon">🔔</span>
                     <span class="badge-count" id="lembretes-badge" style="display: none;">0</span>
@@ -163,7 +166,7 @@
             </form>
         </main>
 
-        <!-- ABA 4: NOTAS ESTILO GOOGLE KEEP -->
+        <!-- ABA 4: NOTAS -->
         <main id="tab-notas" class="tab-content">
             <form id="keep-form" class="keep-card-create" onsubmit="saveNewNota(event)">
                 <input type="text" id="nota-titulo" placeholder="Título da anotação..." class="keep-input-title">
@@ -186,7 +189,26 @@
             </div>
         </main>
 
-        <!-- MODAL DE LEMBRETES (SINO 🔔 NO TOPO DIREITO) -->
+        <!-- MODAL POP-UP DE CHAT FINANCEIRO INTELIGENTE -->
+        <div id="modal-chat" class="modal-overlay" onclick="if(event.target===this) closeChatModal()">
+            <div class="modal-card chat-card-modal">
+                <div class="modal-header">
+                    <span class="modal-title">💬 Assistente Financely</span>
+                    <button class="modal-close" type="button" onclick="closeChatModal()">&times;</button>
+                </div>
+                <div id="chat-messages" class="chat-messages-area">
+                    <div class="chat-msg bot">
+                        Olá! Sou o assistente do seu app. Analiso suas contas, gastos no cartão, saldos e anotações em tempo real. O que você gostaria de saber hoje?
+                    </div>
+                </div>
+                <form id="chat-form" class="chat-input-row" onsubmit="sendChatMessage(event)">
+                    <input type="text" id="chat-input" placeholder="Ex: quanto gastei no cartão? Onde gastei mais?" autocomplete="off" required>
+                    <button type="submit" class="btn-chat-send">➤</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DE LEMBRETES -->
         <div id="modal-lembretes" class="modal-overlay" onclick="if(event.target===this) closeLembretesModal()">
             <div class="modal-card">
                 <div class="modal-header">
@@ -200,7 +222,7 @@
             </div>
         </div>
 
-        <!-- MODAL DE EDIÇÃO COM LÁPIS (✏️) -->
+        <!-- MODAL DE EDIÇÃO COM LÁPIS -->
         <div id="modal-edicao" class="modal-overlay" onclick="if(event.target===this) closeEditModal()">
             <div class="modal-card">
                 <div class="modal-header">
@@ -282,7 +304,7 @@
             </div>
         </div>
 
-        <!-- Barra Inferior 100% Fixa -->
+        <!-- Barra Inferior -->
         <nav class="bottom-nav">
             <button id="nav-btn-inicio" class="nav-item active" type="button" onclick="switchTab('inicio')">
                 <span class="nav-icon">📊</span>

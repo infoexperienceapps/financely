@@ -16,7 +16,6 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Container mobile ocupando 100% da largura útil sem margens laterais sobrando */
 .app-container {
     width: 100%;
     max-width: 100%;
@@ -27,7 +26,6 @@ html, body {
     flex-direction: column;
     gap: 16px;
     position: relative;
-    box-shadow: none;
     overflow-x: hidden;
 }
 
@@ -94,7 +92,6 @@ html, body {
     background-color: #10b981;
 }
 
-/* Abas estendendo em 100% */
 .tab-content {
     display: none;
     flex-direction: column;
@@ -180,7 +177,6 @@ html, body {
 .ranking-name { font-weight: 600; color: #334155; }
 .ranking-val { font-weight: 700; color: #ef4444; }
 
-/* Calendário fluido */
 .month-selector {
     display: flex;
     overflow-x: auto;
@@ -226,7 +222,6 @@ html, body {
 .search-icon { font-size: 0.95rem; opacity: 0.6; }
 .search-box input { border: none; outline: none; width: 100%; font-size: 0.92rem; background: transparent; }
 
-/* Formulário de cadastro em largura total */
 .input-row { display: flex; gap: 8px; width: 100%; max-width: 100%; }
 .input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; width: 100%; max-width: 100%; }
 .input-group label { font-size: 0.82rem; font-weight: 600; color: #475569; }
@@ -269,7 +264,6 @@ html, body {
     cursor: pointer;
 }
 
-/* Lista de contas */
 .contas-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 100%; }
 .conta-item {
     background: #ffffff;
@@ -297,7 +291,6 @@ html, body {
 .status-badge.pendente { background: #fef3c7; color: #b45309; }
 .btn-edit { background: none; border: none; font-size: 1rem; cursor: pointer; opacity: 0.6; padding: 4px; }
 
-/* Bloco de notas */
 .keep-card-create {
     background: #ffffff;
     border: 1px solid #cbd5e1;
@@ -381,7 +374,7 @@ html, body {
 .keep-note-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
 .btn-keep-delete { background: none; border: none; font-size: 0.88rem; cursor: pointer; opacity: 0.6; }
 
-/* Modais responsivos */
+/* MODAIS E CHAT POP-UP */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -409,28 +402,69 @@ html, body {
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
 .modal-title { font-weight: 700; font-size: 1.1rem; color: #0f172a; }
 .modal-close { background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; }
-.modal-actions { display: flex; gap: 8px; margin-top: 6px; }
 
-.modal-lembrete-row {
+/* Estilos Específicos do Chat */
+.chat-card-modal {
+    height: 75vh;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 0.84rem;
-    margin-bottom: 6px;
-    background: #fffbeb;
-    border: 1px solid #fef3c7;
-    width: 100%;
+    flex-direction: column;
 }
-.modal-lembrete-row.atrasada { background: #fee2e2; border-color: #fecaca; color: #b91c1c; font-weight: 600; }
-.modal-lembrete-row.hoje { background: #fef3c7; border-color: #fde68a; color: #b45309; font-weight: 600; }
 
-.health-score-container { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.score-circle { width: 70px; height: 70px; border-radius: 50%; background: #10b981; color: white; font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
-.health-message { font-size: 0.9rem; color: #475569; line-height: 1.4; text-align: center; }
+.chat-messages-area {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 4px;
+}
 
-/* Barra inferior ocupando 100% no celular */
+.chat-msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.chat-msg.bot {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+.chat-msg.user {
+    background-color: #2563eb;
+    color: #ffffff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+}
+.chat-input-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+}
+.btn-chat-send {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
 .bottom-nav {
     position: fixed;
     bottom: 0;
